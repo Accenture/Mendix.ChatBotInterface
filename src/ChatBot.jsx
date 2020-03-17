@@ -8,7 +8,8 @@ class ChatBot extends Component {
         super(props);
         this.state = {
             hideUploadButton: !props.upload,
-            widgetReady: false
+            widgetReady: false,
+            context: ""
         };
     }
 
@@ -18,37 +19,72 @@ class ChatBot extends Component {
                 this.props.secret.status == "available" &&
                 this.props.context.status == "available" &&
                 this.props.username.status == "available" &&
-                this.props.userid.status == "available"
+                this.props.userid.status == "available" &&
+                this.props.useremail.status == "available"
             ) {
-                const store = createStore({}, ({ dispatch }) => next => action => {
-                    if (action.type === "DIRECT_LINE/CONNECT_FULFILLED") {
-                        dispatch({
-                            type: "WEB_CHAT/SEND_EVENT",
-                            payload: {
-                                name: "context/set",
-                                value: {
-                                    app: "web",
-                                    context: this.props.context.value
-                                }
-                            }
-                        });
-                        dispatch({
-                            type: "WEB_CHAT/SEND_EVENT",
-                            payload: {
-                                name: "user/set",
-                                value: {
-                                    email: "pzajac@objectivity.co.uk"
-                                }
-                            }
-                        });
-                    }
-                    return next(action);
-                });
+                var pageContext = this.translateContext(mx.ui.getContentForm().path);
+                var store = this.dispatchStoreContext(pageContext, this.props.useremail.value);
                 const directLine = createDirectLine({ secret: this.props.secret.value });
-                this.setState({ directLine: directLine, widgetReady: true, store: store });
+                this.setState({
+                    directLine: directLine,
+                    widgetReady: true,
+                    store: store,
+                    context: mx.ui.getContentForm().path
+                });
                 clearInterval(this.interval);
             }
         }, 50);
+
+        this.contextListener = setInterval(() => {
+            //console.log("Checking context...");
+            if (mx.ui.getContentForm().path != this.state.context) {
+                console.log("New context! " + mx.ui.getContentForm().path);
+                //check if page context has changed
+                var pageContext = this.translateContext(mx.ui.getContentForm().path); //translate page context to bot context
+                var store_new = this.dispatchStoreContext(pageContext, this.props.useremail.value);
+                console.log(store_new);
+                this.setState({ context: mx.ui.getContentForm().path, store: store_new });
+            }
+        }, 1000);
+    }
+    componentWillUnmount() {
+        clearInterval(this.contextListener);
+    }
+
+    dispatchStoreContext(context, useremail) {
+        return createStore({}, ({ dispatch }) => next => action => {
+            if (action.type === "DIRECT_LINE/CONNECT_FULFILLED") {
+                dispatch({
+                    type: "WEB_CHAT/SEND_EVENT",
+                    payload: {
+                        name: "context/set",
+                        value: {
+                            app: "web",
+                            context: context
+                        }
+                    }
+                });
+                dispatch({
+                    type: "WEB_CHAT/SEND_EVENT",
+                    payload: {
+                        name: "user/set",
+                        value: {
+                            email: useremail
+                        }
+                    }
+                });
+            }
+            return next(action);
+        });
+    }
+
+    translateContext(page) {
+        switch (page) {
+            case "MyFirstModule/Home_Web.page.xml":
+                return "ZZZZZZZZZZZZZZ";
+            default:
+                return "general questions";
+        }
     }
 
     render() {

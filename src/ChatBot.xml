@@ -21,6 +21,13 @@
                     <attributeType name="String"/>
                 </attributeTypes>
             </property>
+            <property key="useremail" type="attribute" required="true">
+                <caption>User email</caption>
+                <description>User email from session</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
             <property key="secret" type="attribute" required="true">
                 <caption>Bot secret</caption>
                 <description>Secret key specifies bot application to plug into</description>
