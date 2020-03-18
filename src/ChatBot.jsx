@@ -9,19 +9,24 @@ class ChatBot extends Component {
         this.state = {
             hideUploadButton: !props.upload,
             widgetReady: false,
-            context: ""
+            currentPath: ""
         };
+        this.onPageChange = this.onPageChange.bind(this);
     }
 
     componentDidMount() {
         this.interval = setInterval(() => {
             if (
-                this.props.secret.status == "available" &&
-                this.props.context.status == "available" &&
                 this.props.username.status == "available" &&
                 this.props.userid.status == "available" &&
-                this.props.useremail.status == "available"
+                this.props.useremail.status == "available" &&
+                this.props.secret.status == "available" &&
+                this.props.enablechatbot.status == "available"
             ) {
+                if (!this.isBotEnabled()) {
+                    clearInterval(this.interval);
+                    return;
+                }
                 var pageContext = this.translateContext(mx.ui.getContentForm().path);
                 var store = this.dispatchStoreContext(pageContext, this.props.useremail.value);
                 const directLine = createDirectLine({ secret: this.props.secret.value });
@@ -29,31 +34,50 @@ class ChatBot extends Component {
                     directLine: directLine,
                     widgetReady: true,
                     store: store,
-                    context: mx.ui.getContentForm().path
+                    currentPath: mx.ui.getContentForm().path
                 });
+                document.addEventListener("pageChanged", this.onPageChange);
                 clearInterval(this.interval);
             }
         }, 50);
-
-        this.contextListener = setInterval(() => {
-            //console.log("Checking context...");
-            if (mx.ui.getContentForm().path != this.state.context) {
-                console.log("New context! " + mx.ui.getContentForm().path);
-                //check if page context has changed
-                var pageContext = this.translateContext(mx.ui.getContentForm().path); //translate page context to bot context
-                var store_new = this.dispatchStoreContext(pageContext, this.props.useremail.value);
-                console.log(store_new);
-                this.setState({ context: mx.ui.getContentForm().path, store: store_new });
-            }
-        }, 1000);
     }
+
+    isBotEnabled() {
+        return this.props.enablechatbot.value === true;
+    }
+
+    onPageChange(event) {
+        if (mx.ui.getContentForm().path != this.state.currentPath) {
+            var pageContext =
+                event.detail == undefined ? this.translateContext(mx.ui.getContentForm().path) : event.detail;
+
+            this.state.store.dispatch({
+                type: "WEB_CHAT/SEND_EVENT",
+                payload: {
+                    name: "context/set",
+                    value: {
+                        app: "web",
+                        context: pageContext
+                    }
+                }
+            });
+            this.setState({ currentPath: mx.ui.getContentForm().path });
+        }
+    }
+
     componentWillUnmount() {
-        clearInterval(this.contextListener);
+        removeEventListener("pageChanged", onPageChange);
     }
 
     dispatchStoreContext(context, useremail) {
         return createStore({}, ({ dispatch }) => next => action => {
             if (action.type === "DIRECT_LINE/CONNECT_FULFILLED") {
+                dispatch({
+                    type: "WEB_CHAT/SEND_EVENT",
+                    payload: {
+                        name: "webchat/join"
+                    }
+                });
                 dispatch({
                     type: "WEB_CHAT/SEND_EVENT",
                     payload: {
@@ -77,39 +101,86 @@ class ChatBot extends Component {
             return next(action);
         });
     }
-
     translateContext(page) {
+        console.log("translating");
         switch (page) {
-            case "MyFirstModule/Home_Web.page.xml":
-                return "ZZZZZZZZZZZZZZ";
+            case "DataManagement/Children_Overview_Mobile.page.xml":
+                return "List of children";
+            case "DataManagement/Child_Profile.page.xml":
+                return "Child's profile";
+            case "DataManagement/Child_Profile_Mobile.page.xml":
+                return "Child's profile";
+            case "DataManagement/Child_ProfileDetails.page.xml":
+                return "Child's profile";
+            case "DataManagement/Child_ProfileDetails_Mobile.page.xml":
+                return "Child's profile";
+            case "EarlyYears.Form_NBAS_Mobile.page.xml":
+                return "NBAS";
+            case "EarlyYears.Form_NBAS.page.xml":
+                return "NBAS";
+            case "EarlyYears.Form_ReadOnly_NBAS_Mobile.page.xml":
+                return "NBAS";
+            case "EarlyYears.Form_ReadOnly_NBAS.page.xml":
+                return "NBAS";
+            case "EarlyYears.Form_NBAS_Mobile.page.xml":
+                return "NBAS";
+            case "EarlyYears/Form_Summary_WellComm_ReadOnly_Mobile.page.xml":
+                return "WellComm";
+            case "EarlyYears/Form_Summary_WellComm_Mobile.page.xml":
+                return "WellComm";
+            case "EarlyYears/Form_Summary_WellComm_ReadOnly.page.xml":
+                return "WellComm";
+            case "EarlyYears/Form_Summary_WellComm.page.xml":
+                return "WellComm";
+            case "EarlyYears/Form_SingleSection.page.xml":
+                try {
+                    switch (mx.ui.getContentForm()._context.trackObject.jsonData.attributes.FormType.value) {
+                        case "EPDS":
+                            return "EPDS";
+                        case "ASQ_3":
+                            return "ASQ 3 and ASQ SE";
+                        case "ASQ_SE_2":
+                            return "ASQ SE";
+                        case "NBAS":
+                            return "NBAS";
+                        default:
+                            return "General Questions";
+                    }
+                } catch (error) {
+                    console.debug(error);
+                    return "General Questions";
+                }
+            case "VideoGuidance/Guidance_Overview.page.xml":
+                return "Videos";
+            case "VideoGuidance/Guidance_Overview_Mobile.page.xml":
+                return "Videos";
+            case "Launchpad/User_Settings.page.xml":
+                return "LaunchPad";
+            case "Launchpad/AppList.page.xml":
+                return "LaunchPad";
             default:
-                return "general questions";
+                return "General Questions";
         }
     }
 
     render() {
-        const chatStyling = {
-            hideUploadButton: this.state.hideUploadButton
-        };
-        if (this.state.widgetReady) {
-            return (
-                <div id="chatbot-container" style={this.props.style} className={this.props.class}>
-                    <ReactWebChat
-                        userID={this.props.userid.value}
-                        username={this.props.username.value}
-                        directLine={this.state.directLine}
-                        store={this.state.store}
-                        styleOptions={chatStyling}
-                    />
-                </div>
-            );
-        } else {
-            return (
-                <div id="chatbot-container" style={this.props.style} className={this.props.class}>
-                    Loading...
-                </div>
-            );
+        if (this.props.enablechatbot.value == true) {
+            const chatStyling = { hideUploadButton: this.state.hideUploadButton };
+            if (this.state.widgetReady) {
+                return (
+                    <div id="chatbot-container" style={this.props.style} className={this.props.class}>
+                        <ReactWebChat
+                            userID={this.props.userid.value}
+                            username={this.props.username.value}
+                            directLine={this.state.directLine}
+                            store={this.state.store}
+                            styleOptions={chatStyling}
+                        />
+                    </div>
+                );
+            }
         }
+        return null;
     }
 }
 

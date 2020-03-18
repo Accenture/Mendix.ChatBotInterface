@@ -8,45 +8,41 @@
     <properties>
         <propertyGroup caption="General">
             <property key="userid" type="attribute" required="true">
-                <caption>userid from session</caption>
-                <description>User ID from autentication</description>
+                <caption>userid from account</caption>
+                <description>User ID from autentication, for Carer: NHS Number</description>
                 <attributeTypes>
                     <attributeType name="String"/>
                 </attributeTypes>
             </property>
             <property key="username" type="attribute" required="true">
-                <caption>Username from session</caption>
-                <description>Username from autentication</description>
+                <caption>Username</caption>
+                <description>User full name</description>
                 <attributeTypes>
                     <attributeType name="String"/>
                 </attributeTypes>
             </property>
             <property key="useremail" type="attribute" required="true">
                 <caption>User email</caption>
-                <description>User email from session</description>
+                <description>User email from authentication</description>
                 <attributeTypes>
                     <attributeType name="String"/>
                 </attributeTypes>
             </property>
-            <property key="secret" type="attribute" required="true">
+            <property key="secret" type="expression" required="true">
                 <caption>Bot secret</caption>
-                <description>Secret key specifies bot application to plug into</description>
-                <attributeTypes>
-                    <attributeType name="String"/>
-                </attributeTypes>
+                <description>Set the environment variable e.g. @Settings.Secret</description>
+                <returnType type="String" />
             </property>
-            <property key="context" type="attribute" required="true">
-                <caption>Bot context</caption>
-                <description>Conversation context</description>
-                <attributeTypes>
-                    <attributeType name="String"/>
-                </attributeTypes>
+            <property key="enablechatbot" type="expression" defaultValue="false" required="true">
+                <caption>Enable chat bot </caption>
+                <description>Set the environment variable e.g. @Settings.EnableWidget</description>
+                <returnType type="Boolean" />
             </property>
         </propertyGroup>
         <propertyGroup caption="Customization">
             <property key="upload" type="boolean" defaultValue="false">
                 <caption>Upload button</caption>
-                <description>Show file upload button</description>
+                <description>Show file upload button on chat view</description>
             </property>
         </propertyGroup>
     </properties>
