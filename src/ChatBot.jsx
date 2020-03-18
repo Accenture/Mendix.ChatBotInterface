@@ -102,7 +102,7 @@ class ChatBot extends Component {
         });
     }
     translateContext(page) {
-        console.log("translating");
+        //debug.log("translating");
         switch (page) {
             case "DataManagement/Children_Overview_Mobile.page.xml":
                 return "List of children";
