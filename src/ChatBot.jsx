@@ -6,10 +6,12 @@ import "./ui/ChatBot.css";
 class ChatBot extends Component {
     constructor(props) {
         super(props);
+        const appProfile = this.getApplicationProfile();
         this.state = {
             hideUploadButton: !props.upload,
             widgetReady: false,
-            currentPath: ""
+            currentPath: "",
+            profile: appProfile
         };
         this.onPageChange = this.onPageChange.bind(this);
     }
@@ -28,7 +30,7 @@ class ChatBot extends Component {
                     return;
                 }
                 var pageContext = this.translateContext(mx.ui.getContentForm().path);
-                var store = this.dispatchStoreContext(pageContext, this.props.useremail.value);
+                var store = this.dispatchStoreContext(pageContext, this.props.useremail.value, this.state.appProfile);
                 const directLine = createDirectLine({ secret: this.props.secret.value });
                 this.setState({
                     directLine: directLine,
@@ -42,6 +44,16 @@ class ChatBot extends Component {
         }, 50);
     }
 
+    getApplicationProfile() {
+        if (window && window.cordova) {
+            return "mobile";
+        } else if (navigator && navigator.product === "ReactNative") {
+            return "mobile";
+        } else {
+            return "web";
+        }
+    }
+
     isBotEnabled() {
         return this.props.enablechatbot.value === true;
     }
@@ -50,13 +62,12 @@ class ChatBot extends Component {
         if (mx.ui.getContentForm().path != this.state.currentPath) {
             var pageContext =
                 event.detail == undefined ? this.translateContext(mx.ui.getContentForm().path) : event.detail;
-
             this.state.store.dispatch({
                 type: "WEB_CHAT/SEND_EVENT",
                 payload: {
                     name: "context/set",
                     value: {
-                        app: "web",
+                        app: this.state.profile, //web/mobile
                         context: pageContext
                     }
                 }
@@ -69,7 +80,7 @@ class ChatBot extends Component {
         removeEventListener("pageChanged", onPageChange);
     }
 
-    dispatchStoreContext(context, useremail) {
+    dispatchStoreContext(context, useremail, profile) {
         return createStore({}, ({ dispatch }) => next => action => {
             if (action.type === "DIRECT_LINE/CONNECT_FULFILLED") {
                 dispatch({
@@ -83,7 +94,7 @@ class ChatBot extends Component {
                     payload: {
                         name: "context/set",
                         value: {
-                            app: "web",
+                            app: this.state.profile, //web/mobile,
                             context: context
                         }
                     }
@@ -102,7 +113,6 @@ class ChatBot extends Component {
         });
     }
     translateContext(page) {
-        //debug.log("translating");
         switch (page) {
             case "DataManagement/Children_Overview_Mobile.page.xml":
                 return "List of children";
