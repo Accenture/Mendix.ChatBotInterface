@@ -114,7 +114,9 @@ class ChatBot extends Component {
     }
     translateContext(page) {
         switch (page) {
-            case "DataManagement/Children_Overview_Mobile.page.xml":
+            case "DataManagement/Carer_Profile.page.xml":
+                return "List of children";
+            case "DataManagement/Carer_Profile_Mobile.page.xml":
                 return "List of children";
             case "DataManagement/Child_Profile.page.xml":
                 return "Child's profile";
