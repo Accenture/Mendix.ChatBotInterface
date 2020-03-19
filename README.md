@@ -1,2 +1,2 @@
 ## ChatBot
-Mendix widget introducing chatbot interface.
+Mendix widget connecting to Microsoft Bot Framework - Webchat
