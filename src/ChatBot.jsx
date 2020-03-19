@@ -125,34 +125,34 @@ class ChatBot extends Component {
             case "DataManagement/Child_ProfileDetails_Mobile.page.xml":
                 return "Child's profile";
             case "EarlyYears.Form_NBAS_Mobile.page.xml":
-                return "NBAS";
+                return "WellComm, NBO and NBAS";
             case "EarlyYears.Form_NBAS.page.xml":
-                return "NBAS";
+                return "WellComm, NBO and NBAS";
             case "EarlyYears.Form_ReadOnly_NBAS_Mobile.page.xml":
-                return "NBAS";
+                return "WellComm, NBO and NBAS";
             case "EarlyYears.Form_ReadOnly_NBAS.page.xml":
-                return "NBAS";
+                return "WellComm, NBO and NBAS";
             case "EarlyYears.Form_NBAS_Mobile.page.xml":
-                return "NBAS";
+                return "WellComm, NBO and NBAS";
             case "EarlyYears/Form_Summary_WellComm_ReadOnly_Mobile.page.xml":
-                return "WellComm";
+                return "WellComm, NBO and NBAS";
             case "EarlyYears/Form_Summary_WellComm_Mobile.page.xml":
-                return "WellComm";
+                return "WellComm, NBO and NBAS";
             case "EarlyYears/Form_Summary_WellComm_ReadOnly.page.xml":
-                return "WellComm";
+                return "WellComm, NBO and NBAS";
             case "EarlyYears/Form_Summary_WellComm.page.xml":
-                return "WellComm";
+                return "WellComm, NBO and NBAS";
             case "EarlyYears/Form_SingleSection.page.xml":
                 try {
                     switch (mx.ui.getContentForm()._context.trackObject.jsonData.attributes.FormType.value) {
                         case "EPDS":
-                            return "EPDS";
+                            return "General Questions";
                         case "ASQ_3":
                             return "ASQ 3 and ASQ SE";
                         case "ASQ_SE_2":
-                            return "ASQ SE";
+                            return "ASQ 3 and ASQ SE";
                         case "NBAS":
-                            return "NBAS";
+                            return "WellComm, NBO and NBAS";
                         default:
                             return "General Questions";
                     }
@@ -182,6 +182,7 @@ class ChatBot extends Component {
                         <ReactWebChat
                             userID={this.props.userid.value}
                             username={this.props.username.value}
+                            locale={"en-GB"}
                             directLine={this.state.directLine}
                             store={this.state.store}
                             styleOptions={chatStyling}
