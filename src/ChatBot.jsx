@@ -19,24 +19,24 @@ class ChatBot extends Component {
     componentDidMount() {
         this.interval = setInterval(() => {
             if (
-                this.props.username.status == "available" &&
-                this.props.userid.status == "available" &&
-                this.props.useremail.status == "available" &&
-                this.props.secret.status == "available" &&
-                this.props.enablechatbot.status == "available"
+                this.props.username.status === "available" &&
+                this.props.userid.status === "available" &&
+                this.props.useremail.status === "available" &&
+                this.props.secret.status === "available" &&
+                this.props.enablechatbot.status === "available"
             ) {
                 if (!this.isBotEnabled()) {
                     clearInterval(this.interval);
                     return;
                 }
-                var pageContext = this.translateContext(mx.ui.getContentForm().path);
+                var pageContext = this.translateContext(window.mx.ui.getContentForm().path);
                 var store = this.dispatchStoreContext(pageContext, this.props.useremail.value, this.state.appProfile);
                 const directLine = createDirectLine({ secret: this.props.secret.value });
                 this.setState({
                     directLine: directLine,
                     widgetReady: true,
                     store: store,
-                    currentPath: mx.ui.getContentForm().path
+                    currentPath: window.mx.ui.getContentForm().path
                 });
                 document.addEventListener("pageChanged", this.onPageChange);
                 clearInterval(this.interval);
@@ -58,29 +58,29 @@ class ChatBot extends Component {
         return this.props.enablechatbot.value === true;
     }
 
-    onPageChange(event) {
-        if (mx.ui.getContentForm().path != this.state.currentPath) {
+    onPageChange = event => {
+        if (window.mx.ui.getContentForm().path !== this.state.currentPath) {
             var pageContext =
-                event.detail == undefined ? this.translateContext(mx.ui.getContentForm().path) : event.detail;
+                event.detail === undefined ? this.translateContext(window.mx.ui.getContentForm().path) : event.detail;
             this.state.store.dispatch({
                 type: "WEB_CHAT/SEND_EVENT",
                 payload: {
                     name: "context/set",
                     value: {
-                        app: this.state.profile, //web/mobile
+                        app: this.state.profile, //web/mobil
                         context: pageContext
                     }
                 }
             });
-            this.setState({ currentPath: mx.ui.getContentForm().path });
+            this.setState({ currentPath: window.mx.ui.getContentForm().path });
         }
-    }
+    };
 
     componentWillUnmount() {
-        removeEventListener("pageChanged", onPageChange);
+        removeEventListener("pageChanged", this.onPageChange);
     }
 
-    dispatchStoreContext(context, useremail, profile) {
+    dispatchStoreContext(context, useremail) {
         return createStore({}, ({ dispatch }) => next => action => {
             if (action.type === "DIRECT_LINE/CONNECT_FULFILLED") {
                 dispatch({
@@ -134,7 +134,7 @@ class ChatBot extends Component {
                 return "WellComm, NBO and NBAS";
             case "EarlyYears.Form_ReadOnly_NBAS.page.xml":
                 return "WellComm, NBO and NBAS";
-            case "EarlyYears.Form_NBAS_Mobile.page.xml":
+            case "EarlyYears.Form_NBO_Mobile.page.xml":
                 return "WellComm, NBO and NBAS";
             case "EarlyYears/Form_Summary_WellComm_ReadOnly_Mobile.page.xml":
                 return "WellComm, NBO and NBAS";
@@ -146,7 +146,7 @@ class ChatBot extends Component {
                 return "WellComm, NBO and NBAS";
             case "EarlyYears/Form_SingleSection.page.xml":
                 try {
-                    switch (mx.ui.getContentForm()._context.trackObject.jsonData.attributes.FormType.value) {
+                    switch (window.mx.ui.getContentForm()._context.trackObject.jsonData.attributes.FormType.value) {
                         case "EPDS":
                             return "General Questions";
                         case "ASQ_3":
@@ -176,7 +176,7 @@ class ChatBot extends Component {
     }
 
     render() {
-        if (this.props.enablechatbot.value == true) {
+        if (this.props.enablechatbot.value === true) {
             const chatStyling = { hideUploadButton: this.state.hideUploadButton };
             if (this.state.widgetReady) {
                 return (
