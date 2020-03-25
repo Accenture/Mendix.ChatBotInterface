@@ -9,6 +9,7 @@ class ChatBot extends Component {
         const appProfile = this.getApplicationProfile();
         this.state = {
             hideUploadButton: !props.upload,
+            wrapTitle: props.wrapTitle,
             widgetReady: false,
             currentPath: "",
             profile: appProfile
@@ -177,7 +178,10 @@ class ChatBot extends Component {
 
     render() {
         if (this.props.enablechatbot.value === true) {
-            const chatStyling = { hideUploadButton: this.state.hideUploadButton };
+            const chatStyling = {
+                hideUploadButton: this.state.hideUploadButton,
+                richCardWrapTitle: this.state.wrapTitle
+            };
             if (this.state.widgetReady) {
                 return (
                     <div id="chatbot-container" style={this.props.style} className={this.props.class}>

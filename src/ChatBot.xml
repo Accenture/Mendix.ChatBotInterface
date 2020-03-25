@@ -44,6 +44,10 @@
                 <caption>Upload button</caption>
                 <description>Show file upload button on chat view</description>
             </property>
+            <property key="wrapTitle" type="boolean" defaultValue="true">
+                <caption>Wrap card title</caption>
+                <description>Applies also for subtitles</description>
+            </property>
         </propertyGroup>
     </properties>
 </widget>
