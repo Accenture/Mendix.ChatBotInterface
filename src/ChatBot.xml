@@ -46,7 +46,7 @@
             </property>
             <property key="wrapTitle" type="boolean" defaultValue="true">
                 <caption>Wrap card title</caption>
-                <description>Applies also for subtitles</description>
+                <description>Applies also for subtitles, if "false" selected, titles will be truncated</description>
             </property>
         </propertyGroup>
     </properties>

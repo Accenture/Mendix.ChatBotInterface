@@ -120,13 +120,13 @@ class ChatBot extends Component {
             case "DataManagement/Carer_Profile_Mobile.page.xml":
                 return "List of children";
             case "DataManagement/Child_Profile.page.xml":
-                return "Child's profile";
+                return "Child profile";
             case "DataManagement/Child_Profile_Mobile.page.xml":
-                return "Child's profile";
+                return "Child profile";
             case "DataManagement/Child_ProfileDetails.page.xml":
-                return "Child's profile";
+                return "Child profile";
             case "DataManagement/Child_ProfileDetails_Mobile.page.xml":
-                return "Child's profile";
+                return "Child profile";
             case "EarlyYears.Form_NBAS_Mobile.page.xml":
                 return "WellComm, NBO and NBAS";
             case "EarlyYears.Form_NBAS.page.xml":
