@@ -48,6 +48,10 @@
                 <caption>Wrap card title</caption>
                 <description>Applies also for subtitles, if "false" selected, titles will be truncated</description>
             </property>
+            <property key="useWebsockets" type="boolean" defaultValue="true">
+                <caption>Use web sockets</caption>
+                <description>If yes, the communication will be based on web sockets connection.</description>
+            </property>
         </propertyGroup>
     </properties>
 </widget>

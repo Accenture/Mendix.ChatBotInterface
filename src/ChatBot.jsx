@@ -32,7 +32,10 @@ class ChatBot extends Component {
                 }
                 var pageContext = this.translateContext(window.mx.ui.getContentForm().path);
                 var store = this.dispatchStoreContext(pageContext, this.props.useremail.value, this.state.appProfile);
-                const directLine = createDirectLine({ secret: this.props.secret.value });
+                const directLine = createDirectLine({
+                    secret: this.props.secret.value,
+                    webSocket: this.props.useWebsockets
+                });
                 this.setState({
                     directLine: directLine,
                     widgetReady: true,
@@ -113,6 +116,7 @@ class ChatBot extends Component {
             return next(action);
         });
     }
+
     translateContext(page) {
         switch (page) {
             case "DataManagement/Carer_Profile.page.xml":
