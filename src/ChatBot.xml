@@ -52,6 +52,10 @@
                 <caption>Use web sockets</caption>
                 <description>If yes, the communication will be based on web sockets connection.</description>
             </property>
+            <property key="wrapperClass" type="string" defaultValue="">
+                <caption>Widget wrapper class</caption>
+                <description>Insert name of class from group box on which you want to trigger opening the bot window.</description>
+            </property>
         </propertyGroup>
     </properties>
 </widget>

@@ -1,6 +1,6 @@
 import { Component, createElement } from "react";
 import { hot } from "react-hot-loader/root";
-import ReactWebChat, { createStore, createDirectLine } from "botframework-webchat";
+import ReactWebChat, { createDirectLine, createStore } from "botframework-webchat";
 import "./ui/ChatBot.css";
 
 class ChatBot extends Component {
@@ -15,6 +15,7 @@ class ChatBot extends Component {
             profile: appProfile
         };
         this.onPageChange = this.onPageChange.bind(this);
+        this.onWrapperClick = this.onWrapperClick.bind(this);
     }
 
     componentDidMount() {
@@ -43,6 +44,12 @@ class ChatBot extends Component {
                     currentPath: window.mx.ui.getContentForm().path
                 });
                 document.addEventListener("pageChanged", this.onPageChange);
+                if (this.props.wrapperClass.value !== "") {
+                    document
+                        .querySelector("." + this.props.wrapperClass)
+                        .querySelector(".mx-groupbox-header")
+                        .addEventListener("click", this.onWrapperClick);
+                }
                 clearInterval(this.interval);
             }
         }, 50);
@@ -80,6 +87,31 @@ class ChatBot extends Component {
         }
     };
 
+    onWrapperClick() {
+        var exec = false;
+        var maxAttempts = 10;
+        var attempts = 0;
+        this.interval = setInterval(() => {
+            // try executing scroll action every 50 ms for 500 ms
+            if (exec === false) {
+                try {
+                    document
+                        .querySelector("ul[role='list']")
+                        .lastChild.scrollIntoView({ behavior: "smooth", block: "start" });
+                    exec = true;
+                } catch (error) {
+                    if (attempts === maxAttempts) {
+                        console.error(
+                            "Reached maximum number of attempts to execute on click action. Task has been terminated."
+                        );
+                        console.error(error);
+                        exec = true;
+                    }
+                }
+            }
+        }, 50);
+    }
+
     componentWillUnmount() {
         removeEventListener("pageChanged", this.onPageChange);
     }
@@ -112,6 +144,10 @@ class ChatBot extends Component {
                         }
                     }
                 });
+            } else if (action.type === "DIRECT_LINE/POST_ACTIVITY_FULFILLED") {
+                document
+                    .querySelector("ul[role='list']")
+                    .lastChild.scrollIntoView({ behavior: "smooth", block: "start" });
             }
             return next(action);
         });
