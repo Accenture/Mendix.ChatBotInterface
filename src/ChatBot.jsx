@@ -106,6 +106,8 @@ class ChatBot extends Component {
                         );
                         console.error(error);
                         exec = true;
+                    } else {
+                        attempts++;
                     }
                 }
             }
