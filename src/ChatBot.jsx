@@ -147,9 +147,13 @@ class ChatBot extends Component {
                     }
                 });
             } else if (action.type === "DIRECT_LINE/POST_ACTIVITY_FULFILLED") {
-                document
-                    .querySelector("ul[role='list']")
-                    .lastChild.scrollIntoView({ behavior: "smooth", block: "start" });
+                try {
+                    document
+                        .querySelector("ul[role='list']")
+                        .lastChild.scrollIntoView({ behavior: "smooth", block: "start" });
+                } catch (error) {
+                    //Could not scroll into message - conversation box hidden.
+                }
             }
             return next(action);
         });
