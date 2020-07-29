@@ -90,25 +90,16 @@ class ChatBot extends Component {
     scrollIntoLastMessage() {
         var message;
         var messages = document.querySelector("ul[role='list']").children;
-        for (var i = 0; i < messages.length; i++) {
-            if (
-                messages[i].firstChild.getElementsByClassName("from-user")[0] !== undefined &&
-                messages[i + 1] !== undefined
-            ) {
+        for (var i = messages.length - 2; i >= 0; i--) {
+            if (messages[i].children[0].querySelector(".from-user") !== null && messages[i + 1] !== undefined) {
                 message = messages[i + 1];
+                break;
             }
         }
         if (message === undefined) {
-            setTimeout(function() {
-                document
-                    .querySelector("ul[role='list']")
-                    .lastChild.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, 50);
-        } else {
-            setTimeout(function() {
-                message.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, 50);
+            message = document.querySelector("ul[role='list']").lastChild;
         }
+        message.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     onWrapperClick() {
