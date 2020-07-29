@@ -87,6 +87,24 @@ class ChatBot extends Component {
         }
     };
 
+    scrollIntoLastMessage() {
+        var message;
+        var messages = document.querySelector("ul[role='list']").children;
+        for (var i = 0; i < messages.length; i++) {
+            if (
+                messages[i].firstChild.getElementsByClassName("from-user")[0] !== undefined &&
+                messages[i + 1] !== undefined
+            ) {
+                message = messages[i + 1];
+            }
+        }
+        if (message === undefined) {
+            document.querySelector("ul[role='list']").lastChild.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+            message.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    }
+
     onWrapperClick() {
         var exec = false;
         var maxAttempts = 10;
@@ -95,9 +113,7 @@ class ChatBot extends Component {
             // try executing scroll action every 50 ms for 500 ms
             if (exec === false) {
                 try {
-                    document
-                        .querySelector("ul[role='list']")
-                        .lastChild.scrollIntoView({ behavior: "smooth", block: "start" });
+                    this.scrollIntoLastMessage();
                     exec = true;
                 } catch (error) {
                     if (attempts === maxAttempts) {
@@ -148,9 +164,7 @@ class ChatBot extends Component {
                 });
             } else if (action.type === "DIRECT_LINE/POST_ACTIVITY_FULFILLED") {
                 try {
-                    document
-                        .querySelector("ul[role='list']")
-                        .lastChild.scrollIntoView({ behavior: "smooth", block: "start" });
+                    this.scrollIntoLastMessage();
                 } catch (error) {
                     //Could not scroll into message - conversation box hidden.
                 }
