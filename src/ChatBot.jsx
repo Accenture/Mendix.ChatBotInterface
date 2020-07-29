@@ -99,9 +99,15 @@ class ChatBot extends Component {
             }
         }
         if (message === undefined) {
-            document.querySelector("ul[role='list']").lastChild.scrollIntoView({ behavior: "smooth", block: "start" });
+            setTimeout(function() {
+                document
+                    .querySelector("ul[role='list']")
+                    .lastChild.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 50);
         } else {
-            message.scrollIntoView({ behavior: "smooth", block: "start" });
+            setTimeout(function() {
+                message.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 50);
         }
     }
 
