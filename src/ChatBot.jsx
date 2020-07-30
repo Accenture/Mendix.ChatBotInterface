@@ -161,7 +161,7 @@ class ChatBot extends Component {
                 });
             } else if (action.type === "DIRECT_LINE/POST_ACTIVITY_FULFILLED") {
                 try {
-                    this.scrollIntoLastMessage();
+                    setTimeout(this.scrollIntoLastMessage(), 100);
                 } catch (error) {
                     //Could not scroll into message - conversation box hidden.
                 }
