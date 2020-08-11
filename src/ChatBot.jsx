@@ -12,14 +12,15 @@ class ChatBot extends Component {
             wrapTitle: props.wrapTitle,
             widgetReady: false,
             currentPath: "",
-            profile: appProfile
+            profile: appProfile,
+            lastUserText: ""
         };
         this.onPageChange = this.onPageChange.bind(this);
         this.onWrapperClick = this.onWrapperClick.bind(this);
     }
 
     componentDidMount() {
-        this.interval = setInterval(() => {
+        const interval = setInterval(() => {
             if (
                 this.props.username.status === "available" &&
                 this.props.userid.status === "available" &&
@@ -28,7 +29,7 @@ class ChatBot extends Component {
                 this.props.enablechatbot.status === "available"
             ) {
                 if (!this.isBotEnabled()) {
-                    clearInterval(this.interval);
+                    clearInterval(interval);
                     return;
                 }
                 var pageContext = this.translateContext(window.mx.ui.getContentForm().path);
@@ -50,7 +51,7 @@ class ChatBot extends Component {
                         .querySelector(".mx-groupbox-header")
                         .addEventListener("click", this.onWrapperClick);
                 }
-                clearInterval(this.interval);
+                clearInterval(interval);
             }
         }, 50);
     }
@@ -88,40 +89,49 @@ class ChatBot extends Component {
     };
 
     scrollIntoLastMessage() {
+        //if your message is the last one, wait else - scroll
         var message;
-        var messages = document.querySelector("ul[role='list']").children;
-        for (var i = messages.length - 2; i >= 0; i--) {
-            if (messages[i].children[0].querySelector(".from-user") !== null && messages[i + 1] !== undefined) {
-                message = messages[i + 1];
-                break;
+        var messages;
+        if (this.state.lastUserText === "") {
+            document.querySelector("ul[role='list']").lastChild.scrollIntoView({ behavior: "smooth", block: "start" });
+            return;
+        }
+        const scrollInterval = setInterval(() => {
+            messages = document.querySelector("ul[role='list']").children;
+            if (messages[messages.length - 1].children[0].querySelector(".from-user") === null) {
+                for (var i = messages.length - 2; i >= 0; i--) {
+                    if (
+                        messages[i].lastChild.children[0].children[0].children[1].children[0].innerText ===
+                        this.state.lastUserText
+                    ) {
+                        message = messages[i + 1];
+                        break;
+                    }
+                }
             }
-        }
-        if (message === undefined) {
-            message = document.querySelector("ul[role='list']").lastChild;
-        }
-        message.scrollIntoView({ behavior: "smooth", block: "start" });
+            if (message !== undefined) {
+                message.scrollIntoView({ behavior: "smooth", block: "start" });
+                clearInterval(scrollInterval);
+            }
+        }, 50);
     }
 
     onWrapperClick() {
-        var exec = false;
         var maxAttempts = 10;
         var attempts = 0;
-        this.interval = setInterval(() => {
-            // try executing scroll action every 50 ms for 500 ms
-            if (exec === false) {
-                try {
-                    this.scrollIntoLastMessage();
-                    exec = true;
-                } catch (error) {
-                    if (attempts === maxAttempts) {
-                        console.error(
-                            "Reached maximum number of attempts to execute on click action. Task has been terminated."
-                        );
-                        console.error(error);
-                        exec = true;
-                    } else {
-                        attempts++;
-                    }
+        const wrapperInterval = setInterval(() => {
+            try {
+                this.scrollIntoLastMessage();
+                clearInterval(wrapperInterval);
+            } catch (error) {
+                if (attempts === maxAttempts) {
+                    console.error(
+                        "Reached maximum number of attempts to execute on click action. Task has been terminated."
+                    );
+                    console.error(error);
+                    clearInterval(wrapperInterval);
+                } else {
+                    attempts++;
                 }
             }
         }, 50);
@@ -159,9 +169,21 @@ class ChatBot extends Component {
                         }
                     }
                 });
-            } else if (action.type === "DIRECT_LINE/POST_ACTIVITY_FULFILLED") {
+            } else if (
+                action.type === "DIRECT_LINE/INCOMING_ACTIVITY" &&
+                action.payload.activity.from.role === "user" &&
+                action.payload.activity.type === "message"
+            ) {
+                this.setState({
+                    lastUserText: action.payload.activity.text
+                });
+            } else if (
+                action.type === "DIRECT_LINE/INCOMING_ACTIVITY" &&
+                action.payload.activity.from.role === "bot" &&
+                action.payload.activity.type === "message"
+            ) {
                 try {
-                    setTimeout(this.scrollIntoLastMessage(), 100);
+                    this.scrollIntoLastMessage();
                 } catch (error) {
                     //Could not scroll into message - conversation box hidden.
                 }
